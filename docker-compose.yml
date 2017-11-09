@@ -1,0 +1,38 @@
+version: '2'
+services:
+    journey_api_php:
+        build: docker/images/php
+        volumes:
+            - ./docker/config/apache2:/etc/apache2/sites-enabled
+            - ./docker/config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+            - ./:/var/www/html
+        container_name: journey-api_php
+        ports:
+            - 2345:80
+        networks:
+            - vpcbr
+        privileged: true
+        environment:
+            - APP_ENV=develop
+            - SET_CONTAINER_TIMEZONE=true
+            - CONTAINER_TIMEZONE=Europe/Paris
+        networks:
+            - vpcbr
+    journey_api_db:
+        image: mysql
+        container_name: journey-api_db
+        ports:
+            - 6789:3306
+        networks:
+            - vpcbr
+        environment:
+            - MYSQL_USER=root
+            - MYSQL_ROOT_PASSWORD=toor
+            - MYSQL_DATABASE=journey
+        volumes:
+            - ./docker/data/db:/var/lib/mysql
+
+networks:
+  vpcbr:
+    external:
+      name: vpcbr

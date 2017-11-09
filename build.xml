@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Fei-App" default="main">
+  <!-- get local properties file if exists -->
+  <!-- start building -->
+  <target name="main">
+    <echo msg="Create namespace directory ..." />
+    <property file="phing/properties/global.properties" />
+    <copy file="phing/tpl/composer/composer.json.tpl" tofile="../../../composer.json" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="namespace.project" value="${namespace.project}\\" />
+          <token key="composer.project.name" value="${composer.project.name}" />
+          <token key="composer.project.description" value="${composer.project.description}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+
+  </target>
+
+  <!-- default file -->
+  <target name="defaultFile">
+    <echo msg="Create default file ..." />
+    <property file="phing/properties/global.properties" />
+
+    <!-- app/src/Action/Home.php -->
+    <copy file="phing/tpl/app/home.php.tpl" tofile="../../../app/src/Action/Home.php" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="namespace.class.escape" value="${namespace.class.escape}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+
+    <!-- app/src/Application.php -->
+    <copy file="phing/tpl/app/application.php.tpl" tofile="../../../app/src/Application.php" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="namespace.class.escape" value="${namespace.class.escape}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+
+    <!-- app/src/Middleware/LayoutSwitcher.php -->
+    <copy file="phing/tpl/app/layoutswitcher.php.tpl" tofile="../../../app/src/Middleware/LayoutSwitcher.php" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="namespace.class.escape" value="${namespace.class.escape}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+
+    <!-- app/src/Middleware/LayoutSwitcher.php -->
+    <copy file="phing/tpl/app/index.php.tpl" tofile="../../../public/index.php" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="namespace.class.escape" value="${namespace.class.escape}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+
+    <!-- app/config/app.php -->
+    <copy file="phing/tpl/app/config/app.php.tpl" tofile="../../../app/config/app.php" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="namespace.project" value="${namespace.project}" />
+          <token key="project.name" value="${project.name}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+  </target>
+
+  <!-- Docker config -->
+  <target name="docker">
+    <echo msg="Build docker compose default" />
+    <property file="phing/properties/docker.properties" />
+    <copy file="phing/tpl/docker/docker-compose.yml.tpl" tofile="docker-compose.yml" overwrite="true">
+      <filterchain>
+        <replacetokens begintoken="%%" endtoken="%%">
+          <token key="container.name" value="${container.name}" />
+          <token key="apache.port" value="${apache.port}" />
+          <token key="mysql.port" value="${mysql.port}" />
+          <token key="mysql.user" value="${mysql.user}" />
+          <token key="mysql.password" value="${mysql.password}" />
+          <token key="mysql.db.name" value="${mysql.db.name}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+  </target>
+
+</project>
