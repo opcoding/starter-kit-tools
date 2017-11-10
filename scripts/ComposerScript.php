@@ -48,7 +48,7 @@ class ComposerScript
 
         $io->write(sprintf('<comment>Namespace format: My\\\Super\\\Namespace</comment>'));
         $namespace = Helper::createQuestion("Default namespace for autoload : ", function($result) use ($io){
-            if (preg_match('/((?:\\\\w+|\w+\\\\{2})(?:\w+\\\\{0,2})+)/', $result) === 1) {
+            if (preg_match('/^((\w+)|(?:\w+\\\\{2}\w+)+)$/', $result) === 1) {
                 return $result;
             }
             $io->writeError("<error>The namespace format must be My\\\\Namespace. Please try again</error>");
