@@ -1,7 +1,7 @@
 version: '2'
 services:
     journey_api_php:
-        build: docker/images/php
+        build: scripts/Resources/docker/images/php
         volumes:
             - ./docker/config/apache2:/etc/apache2/sites-enabled
             - ./docker/config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini

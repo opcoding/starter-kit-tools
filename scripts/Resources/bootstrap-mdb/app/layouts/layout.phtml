@@ -1,0 +1,84 @@
+<?php
+use ObjectivePHP\Application\Config\ApplicationName;
+use ObjectivePHP\Application\View\Helper\Vars;
+use ObjectivePHP\Html\Css;
+use ObjectivePHP\Html\Js;
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title><?= Vars::config()->get(ApplicationName::class) . ' / Starter kit' ?></title>
+
+    <?php
+    // embed CSS files
+
+    // Bootstrap core CSS and material design
+    Css::prepend('/css/theme.css');
+    Css::prepend('/mdb/css/mdb.min.css');
+    Css::prepend('/mdb/css/bootstrap.min.css');
+
+    // dump all CSS
+    Css::dump();
+    ?>
+</head>
+
+<body role="document">
+
+<header>
+    <?php include __DIR__ . '/partials/navbar.phtml'; ?>
+</header>
+
+
+<main>
+
+    <!--Main layout-->
+    <div class="container">
+        <!--First row-->
+        <div class="row wow fadeIn" data-wow-delay="0.2s">
+            <div class="col-md-12">
+                <div class="jumbotron">
+                    <h1>
+                        <?= Vars::get('page.title') ?>
+                        <br />
+                        <?= Vars::string('page.subtitle')->prepend('<small>')->append('</small>') ?>
+                    </h1>
+                    <p></p>
+                    <h2 class="h2-responsive">Material Design for Bootstrap</h2>
+                    <br>
+                    <p>Powerful and free Material Design UI KIT</p>
+                    <hr>
+                    <p>Register for free and get access to amazing framework and beautiful components</p>
+                    <a target="_blank" href="https://mdbootstrap.com/getting-started/" class="btn btn-outline-unique" rel="nofollow">Download <i class="fa fa-download right"></i></a>
+                    <a target="_blank" href="https://mdbootstrap.com/material-design-for-bootstrap/" class="btn btn-unique btn-ptc" rel="nofollow">Learn more <i class="fa fa-book right"></i></a>
+                </div>
+            </div>
+        </div>
+        <!--/.First row-->
+
+        <hr class="extra-margins">
+
+        <?php include __DIR__ . '/partials/notifications.phtml'; ?>
+        <div>
+            <?= Vars::get('view.output') ?>
+        </div>
+
+</main>
+
+<?php
+Js::prepend('/mdb/js/mdb.min.js');
+Js::prepend('/mdb/js/bootstrap.min.js');
+Js::prepend('/mdb/js/popper.min.js'); //2nd
+Js::prepend('/mdb/js/jquery-3.2.1.min.js'); // 1st
+
+Js::dump();
+?>
+</body>
+</html>

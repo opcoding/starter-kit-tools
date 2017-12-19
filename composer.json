@@ -20,9 +20,7 @@
     },
     "scripts": {
         "post-create-project-cmd" : [
-            "Opcoding\\StarterKit\\Tools\\ComposerScript::exec",
-            "Opcoding\\StarterKit\\Tools\\DockerScript::exec",
-            "Opcoding\\StarterKit\\Tools\\DefaultFileScript::exec",
+            "Opcoding\\StarterKit\\Tools\\StarterKit::init",
             "composer dump-autoload"
         ]
     }

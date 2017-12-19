@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Fei-App" default="main">
+<project name="Fei-App" default="defaultFile">
   <!-- get local properties file if exists -->
   <!-- start building -->
-  <target name="main">
-    <echo msg="Create namespace directory ..." />
-    <property file="phing/properties/global.properties" />
-    <copy file="phing/tpl/composer/composer.json.tpl" tofile="../../../composer.json" overwrite="true">
-      <filterchain>
-        <replacetokens begintoken="%%" endtoken="%%">
-          <token key="namespace.project" value="${namespace.project}\\" />
-          <token key="composer.project.name" value="${composer.project.name}" />
-          <token key="composer.project.description" value="${composer.project.description}" />
-        </replacetokens>
-      </filterchain>
-    </copy>
-
-  </target>
+  <!--<target name="main">-->
+    <!--<echo msg="Create namespace directory ..." />-->
+    <!--<property file="phing/properties/global.properties" />-->
+  <!--</target>-->
 
   <!-- default file -->
   <target name="defaultFile">
