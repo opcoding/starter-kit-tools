@@ -29,6 +29,23 @@ class ComposerScript
     }
 
     /**
+     * Update composer.json
+     *
+     * @throws \Exception
+     */
+    public function updateComposerJson()
+    {
+        /** @var array $composerJsonData */
+        $composerJsonData = $this->jsonFile->read();
+        $newData = $this->getDataForComposer();
+        $this->setGlobalPropertiesFile($newData['property-file']);
+
+        unset($newData['property-file']);
+
+        $this->jsonFile->write(array_merge($composerJsonData, $newData));
+    }
+
+    /**
      * @return array
      */
     private function getDataForComposer()
@@ -67,7 +84,7 @@ class ComposerScript
             'description' => $description,
             'autoload' => [
                 'psr-4' => [
-                    $namespace => 'app/src'
+                    str_replace('\\\\','\\', $namespace) . '\\' => 'app/src'
                 ]
             ],
             'property-file' => [
@@ -76,6 +93,9 @@ class ComposerScript
         ];
     }
 
+    /**
+     * @param array $data
+     */
     private function setGlobalPropertiesFile($data)
     {
         $io = $this->io;
@@ -88,7 +108,7 @@ class ComposerScript
             return false;
         }, $io);
 
-        $namespace = $data['property-file']['namespace'];
+        $namespace = $data['namespace'];
 
         $data = sprintf(
             'namespace.project=%s
@@ -96,22 +116,5 @@ class ComposerScript
              project.name=%s
             ', $namespace, str_replace("\\\\", '\\', $namespace), $projectName);
         file_put_contents(StarterKit::VENDOR_PATH . 'phing/properties/global.properties', $data);
-    }
-
-    /**
-     * Update composer.json
-     */
-    public function updateComposerJson()
-    {
-        /** @var array $composerJsonData */
-        $composerJsonData = $this->jsonFile->read();
-        $newData = $this->getDataForComposer();
-
-        $this->setGlobalPropertiesFile($newData['property-file']);
-        unset($newData['property-file']);
-
-        array_merge($composerJsonData, $newData);
-
-        $this->jsonFile->write(array_merge($composerJsonData, $newData));
     }
 }

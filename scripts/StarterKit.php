@@ -55,19 +55,31 @@ class StarterKit
 
         $starterKit->setComposer($starterKit->io, $starterKit->composerJson);
         $starterKit->setPhpConfig();
-
+        $starterKit->addAssets($starterKit->projectRoot, $starterKit->io);
         //end
-        $starterKit->clearComposerJson();
+//        $starterKit->clearComposerJson();
     }
 
     /**
      * @param IOInterface $io
      * @param JsonFile    $composerJson
+     *
+     * @throws Exception
      */
     private function setComposer(IOInterface $io, JsonFile $composerJson)
     {
         (new ComposerScript($io, $composerJson))
             ->updateComposerJson();
+    }
+
+    /**
+     * @param             $projectRoot
+     * @param IOInterface $io
+     */
+    private function addAssets($projectRoot, IOInterface $io)
+    {
+        (new AssetsScript($projectRoot, $io))
+            ->copyFiles();
     }
 
     /**
@@ -85,11 +97,12 @@ class StarterKit
 
     /**
      * Remove post-create-project-cmd
+     *
+     * @throws Exception
      */
     private function clearComposerJson()
     {
         $data = $this->composerJson->read();
-
         unset($data['scripts']['post-create-project-cmd']);
 
         $this->composerJson->write($data);

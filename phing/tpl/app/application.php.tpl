@@ -68,7 +68,6 @@ class Application extends AbstractApplication
 
         // handle view rendering
         $this->getStep('rendering')
-            ->plug(LayoutSwitcher::class, new UrlFilter('/'), function () { return (bool) rand(0, 1);})
             ->plug(new ViewResolver())->as('view-resolver')
             ->plug(new ViewRenderer())->as('view-renderer');
 
