@@ -45,6 +45,8 @@ class StarterKit
     }
 
     /**
+     * Function call by composer after post-create-project install
+     *
      * @param Event $event
      *
      * @throws Exception
@@ -57,7 +59,7 @@ class StarterKit
         $starterKit->setPhpConfig();
         $starterKit->addAssets($starterKit->projectRoot, $starterKit->io);
         //end
-//        $starterKit->clearComposerJson();
+        $starterKit->cleanComposerJson();
     }
 
     /**
@@ -92,6 +94,7 @@ class StarterKit
         }
 
         shell_exec("vendor/bin/phing -debug -f vendor/opcoding/starter-kit-tools/build.xml defaultFile");
+
         $this->io->write(sprintf('<info>Namespaces updated</info>'));
     }
 
@@ -100,10 +103,13 @@ class StarterKit
      *
      * @throws Exception
      */
-    private function clearComposerJson()
+    private function cleanComposerJson()
     {
         $data = $this->composerJson->read();
-        unset($data['scripts']['post-create-project-cmd']);
+
+        if (isset($data['scripts']['post-create-project-cmd'])) {
+            unset($data['scripts']['post-create-project-cmd']);
+        }
 
         $this->composerJson->write($data);
     }
