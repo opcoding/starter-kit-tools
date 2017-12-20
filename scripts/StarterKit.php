@@ -8,6 +8,11 @@ use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Script\Event;
 use Exception;
+use FilesystemIterator;
+use Opcoding\StarterKit\Tools\Helper\QuestionsHelper;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 
 /**
  * Class StarterKit
@@ -17,6 +22,10 @@ use Exception;
 class StarterKit
 {
     const VENDOR_PATH = "vendor/opcoding/starter-kit-tools/";
+
+    const KEY_QUESTION_DOCKER = 'docker';
+    const KEY_QUESTION_COMPOSER = 'composer';
+    const KEY_QUESTION_ASSETS = 'assets';
 
     /** @var string */
     protected $projectRoot;
@@ -58,6 +67,7 @@ class StarterKit
         $starterKit->setComposer($starterKit->io, $starterKit->composerJson);
         $starterKit->setPhpConfig();
         $starterKit->addAssets($starterKit->projectRoot, $starterKit->io);
+        $starterKit->addDocker($starterKit->projectRoot, $starterKit->io);
         //end
         $starterKit->cleanComposerJson();
     }
@@ -71,17 +81,8 @@ class StarterKit
     private function setComposer(IOInterface $io, JsonFile $composerJson)
     {
         (new ComposerScript($io, $composerJson))
-            ->updateComposerJson();
-    }
-
-    /**
-     * @param             $projectRoot
-     * @param IOInterface $io
-     */
-    private function addAssets($projectRoot, IOInterface $io)
-    {
-        (new AssetsScript($projectRoot, $io))
-            ->copyFiles();
+            ->setQuestionHelper(new QuestionsHelper(self::KEY_QUESTION_COMPOSER, $io))
+            ->init();
     }
 
     /**
@@ -94,8 +95,32 @@ class StarterKit
         }
 
         shell_exec("vendor/bin/phing -debug -f vendor/opcoding/starter-kit-tools/build.xml defaultFile");
+    }
 
-        $this->io->write(sprintf('<info>Namespaces updated</info>'));
+    /**
+     * @param             $projectRoot
+     * @param IOInterface $io
+     *
+     * @throws Exception
+     */
+    private function addAssets($projectRoot, IOInterface $io)
+    {
+        (new AssetsScript($projectRoot, $io))
+            ->setQuestionHelper(new QuestionsHelper(self::KEY_QUESTION_ASSETS, $io))
+            ->init();
+    }
+
+    /**
+     * @param             $projectRoot
+     * @param IOInterface $io
+     *
+     * @throws Exception
+     */
+    private function addDocker($projectRoot, IOInterface $io)
+    {
+        (new DockerScript($io, $projectRoot))
+            ->setQuestionHelper(new QuestionsHelper(self::KEY_QUESTION_DOCKER, $io))
+            ->init();
     }
 
     /**
@@ -112,23 +137,5 @@ class StarterKit
         }
 
         $this->composerJson->write($data);
-    }
-
-    /**
-     * @param $question
-     * @param $validator
-     * @param $io
-     *
-     * @return string
-     */
-    static public function createQuestion($question, $validator, $io)
-    {
-        $response = false;
-
-        while (empty($response)) {
-            $response = $io->askAndValidate(sprintf('<question>%s</question>',$question), $validator);
-        }
-
-        return $response;
     }
 }

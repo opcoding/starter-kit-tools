@@ -10,7 +10,7 @@ use Composer\Json\JsonFile;
  *
  * @package Command
  */
-class ComposerScript
+class ComposerScript extends AbstractQuestionScript
 {
 
     /** @var IOInterface io */
@@ -21,6 +21,9 @@ class ComposerScript
 
     /**
      * ComposerScript constructor.
+     *
+     * @param IOInterface     $io
+     * @param JsonFile        $jsonFile
      */
     public function __construct(IOInterface $io, JsonFile $jsonFile)
     {
@@ -29,11 +32,19 @@ class ComposerScript
     }
 
     /**
+     * @throws \Exception
+     */
+    public function init()
+    {
+        $this->updateComposerJson();
+    }
+
+    /**
      * Update composer.json
      *
      * @throws \Exception
      */
-    public function updateComposerJson()
+    private function updateComposerJson()
     {
         /** @var array $composerJsonData */
         $composerJsonData = $this->jsonFile->read();
@@ -52,32 +63,35 @@ class ComposerScript
     {
         $io = $this->io;
 
-        $io->write(sprintf('<comment>Set composer.json information (project name, description, namespace psr-4)</comment>'));
-        $name = StarterKit::createQuestion("Project name (Example: foo/bar) : ", function($result) use ($io){
+        $io->write(sprintf('<comment>[Start configuration composer.json (project name, description, namespace psr-4)]</comment>'));
+
+        $validateName = function($result) use ($io){
             $res = strtolower($result);
             if (preg_match('/^[a-z0-9-]+\/[a-z0-9-]+$/', $res) === 1) {
                 return $res;
             }
             $io->writeError("<error>The format must be foo/bar</error>");
             return false;
-        }, $io);
+        };
+        $name = $this->getQuestionHelper()
+            ->askQuestion(1, $validateName);
 
-        $description = StarterKit::createQuestion("Project description : ", function($result) use ($io){
+        $validateDescription = function($result) use ($io){
             $res = trim($result);
-            if (!empty($res)) {
-                return $res;
-            }
-            return false;
-        }, $io);
+            return (!empty($res)) ? $res : false;
+        };
+        $description = $this->getQuestionHelper()
+            ->askQuestion(2, $validateDescription);
 
-        $io->write(sprintf('<comment>Namespace format: My\\\Super\\\Namespace</comment>'));
-        $namespace = StarterKit::createQuestion("Default namespace for autoload : ", function($result) use ($io){
+        $validateNamespace = function($result) use ($io){
             if (preg_match('/^((\w+)|(?:\w+\\\\{2}\w+)+)$/', $result) === 1) {
                 return $result;
             }
             $io->writeError("<error>The namespace format must be My\\\\Namespace. Please try again</error>");
             return false;
-        }, $io);
+        };
+        $namespace = $this->getQuestionHelper()
+            ->askQuestion(3,$validateNamespace);
 
         return [
             'name' => $name,
@@ -100,14 +114,12 @@ class ComposerScript
     {
         $io = $this->io;
 
-        $projectName = StarterKit::createQuestion("Project name (application name) : ", function($result) use ($io){
+        $validateProjectName = function($result) use ($io){
             $res = trim($result);
-            if (!empty($res)) {
-                return $res;
-            }
-            return false;
-        }, $io);
+            return (!empty($res)) ? $res : false;
+        };
 
+        $projectName = $this->getQuestionHelper()->askQuestion(4, $validateProjectName);
         $namespace = $data['namespace'];
 
         $data = sprintf(
@@ -115,6 +127,7 @@ class ComposerScript
              namespace.class.escape=%s
              project.name=%s
             ', $namespace, str_replace("\\\\", '\\', $namespace), $projectName);
+
         file_put_contents(StarterKit::VENDOR_PATH . 'phing/properties/global.properties', $data);
     }
 }

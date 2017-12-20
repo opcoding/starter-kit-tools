@@ -1,16 +1,10 @@
 <?php
-
-
 namespace Opcoding\StarterKit\Tools;
 
-
 use Composer\IO\IOInterface;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
+use Opcoding\StarterKit\Tools\Helper\CopyFilesHelper;
 
-class AssetsScript
+class AssetsScript extends AbstractQuestionScript
 {
     /** @var string */
     protected $rootPathProject;
@@ -21,8 +15,8 @@ class AssetsScript
     /**
      * AssetsScript constructor.
      *
-     * @param string      $rootPathProject
-     * @param IOInterface $io
+     * @param                 $rootPathProject
+     * @param IOInterface     $io
      */
     public function __construct($rootPathProject, IOInterface $io)
     {
@@ -30,47 +24,23 @@ class AssetsScript
         $this->io = $io;
     }
 
-    private function askQuestion()
+    /**
+     * @return string
+     */
+    private function askAssetsYouWant()
     {
-        $response = StarterKit::createQuestion("Which bootstrap would you want ? (mdb / bt) : ",
-            function($result){
-                return ($result == "mdb") ? "bootstrap-mdb" : "bootstrap";
-            }, $this->io);
-
-        return $response;
-    }
-
-    public function copyFiles()
-    {
-        $rep = realpath(__DIR__) . '/Resources/' . $this->askQuestion();
-
-        $rdi = new RecursiveDirectoryIterator($rep, FilesystemIterator::SKIP_DOTS);
-        $rii = new RecursiveIteratorIterator($rdi);
-        /**
-         * @var  $key
-         * @var SplFileInfo $item
-         */
-        foreach ($rii as $key => $item) {
-            $fullDest = $this->rootPathProject . str_replace($rep, '', $item->getPathname());
-            $this->createDirectories($fullDest);
-            copy($item->getPathname(), $fullDest);
-        }
+        $this->io->write(sprintf('<comment>[Start assets configuration]</comment>'));
+        return $this->getQuestionHelper()->askQuestion(1, function($result){
+            return ($result == "mdb") ? "bootstrap-mdb" : "bootstrap";
+        });
     }
 
     /**
-     * @param $dest
-     *
      * @throws \Exception
      */
-    private function createDirectories($dest)
+    public function init()
     {
-        $shouldExists = pathinfo($dest, PATHINFO_DIRNAME);
-        if (!is_dir($shouldExists)) {
-            try {
-                mkdir($shouldExists, 0755, true);
-            } catch (\ErrorException $e) {
-                throw new \Exception(sprintf('Cannot create directory `%s` %s', $shouldExists, $e->getMessage()));
-            }
-        }
+        (new CopyFilesHelper($this->askAssetsYouWant(), $this->rootPathProject))
+            ->copyFiles();
     }
 }

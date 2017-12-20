@@ -18,20 +18,6 @@ services:
             - CONTAINER_TIMEZONE=Europe/Paris
         networks:
             - vpcbr
-    %%container.name%%_api_db:
-        image: mysql
-        container_name: %%container.name%%-api_db
-        ports:
-            - %%mysql.port%%:3306
-        networks:
-            - vpcbr
-        environment:
-            - MYSQL_USER=%%mysql.user%%
-            - MYSQL_ROOT_PASSWORD=%%mysql.password%%
-            - MYSQL_DATABASE=%%mysql.db.name%%
-        volumes:
-            - ./docker/data/db:/var/lib/mysql
-
 networks:
   vpcbr:
     external:

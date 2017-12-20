@@ -2,70 +2,112 @@
 
 namespace Opcoding\StarterKit\Tools;
 
-use Composer\Script\Event;
+use Composer\IO\IOInterface;
+use Opcoding\StarterKit\Tools\Helper\CopyFilesHelper;
 
 /**
  * Class DockerScript
  *
  * @package Scripts
  */
-class DockerScript
+class DockerScript extends AbstractQuestionScript
 {
+
+    /** @var IOInterface */
+    protected $io;
+
+    /** @var string */
+    protected $rootPathProject;
+
     /**
-     * @param Event $event
+     * DockerScript constructor.
      *
+     * @param IOInterface $io
+     * @param             $rootPathProject
+     */
+    public function __construct(IOInterface $io, $rootPathProject)
+    {
+        $this->io = $io;
+        $this->rootPathProject = $rootPathProject;
+    }
+
+    /**
      * @throws \Exception
      */
-    static public function exec(Event $event)
+    public function init()
     {
-        /*$io = $event->getIO();
+        if ($this->wantDocker()) {
+            $this->setDockerParameters();
+            $this->copyFiles();
+        }
+    }
 
+    /**
+     * If true, starts setting docker
+     *
+     * @return bool
+     */
+    private function wantDocker()
+    {
+        $io = $this->io;
 
-        $io->write("<comment>Start docker configuration</comment>");
-        $containerName = Helper::createQuestion("Container name (example: Project which become project-api_db) : ", function($result) use ($io) {
+        $validate = function($result) use ($io) {
+            if (empty(trim($result)) || (!in_array($result, ['y', 'n']))) {
+                $io->writeError("<error>Possible choice 'y' or 'n'</error>");
+                return false;
+            }
+            return $result;
+        };
+
+        $wantDocker = $this->getQuestionHelper()->askQuestion(1, $validate);
+
+        return $wantDocker == 'y' ? true : false;
+    }
+
+    /**
+     * Sets the parameters for docker compose
+     */
+    private function setDockerParameters()
+    {
+        $io = $this->io;
+
+        $this->io->write(sprintf('<comment>[Start docker configuration]</comment>'));
+
+        $validateContainerName = function($result) use ($io) {
             if (empty(trim($result))) {
                 $io->writeError("<error>Please, enter your container name</error>");
                 return false;
             }
             return $result;
-        }, $io);
+        };
+        $containerName = $this->getQuestionHelper()->askQuestion(2, $validateContainerName);
 
-        // Apache part
-        $apachePort = Helper::createQuestion("Apache port : ", function($result) use ($io) {
+        $validateApachePort = function($result) use ($io) {
             if (!is_numeric($result) || is_float($result)) {
                 $io->writeError("<error>The apache port must be an integer</error>");
                 return false;
             }
             return $result;
-        }, $io);
-
-        // MySQL PART
-        $io->write("<comment>MySQL configuration for Docker</comment>");
-        $mysqlPort = Helper::createQuestion("MySQL port : ", function($result) use ($io) {
-            if (!is_numeric($result) || is_float($result)) {
-                $io->writeError("<error>The MySQL port must be an integer</error>");
-                return false;
-            }
-            return $result;
-        }, $io);
-        $mysqlUser = $io->ask("MySQL username (default: root) : ", 'root');
-        $mysqlPassword = $io->ask("MySQL password (default: toor) :  ", 'toor');
-        $defaultDbName = strtolower(trim(str_replace(' ', '_', $containerName)));
-        $mysqlDbName = $io->ask(sprintf("MySQL database name (default: %s) : ", $defaultDbName), $defaultDbName);
+        };
+        $apachePort = $this->getQuestionHelper()->askQuestion(3, $validateApachePort);
 
         $data = sprintf(
             'container.name=%s
-             apache.port=%s
-             mysql.port=%s
-             mysql.user=%s
-             mysql.password=%s
-             mysql.db.name=%s',
-            strtolower($containerName), $apachePort, $mysqlPort, $mysqlUser, $mysqlPassword, $mysqlDbName
+             apache.port=%s',
+            strtolower($containerName), $apachePort
         );
 
-        file_put_contents(Helper::VENDOR_PATH . 'phing/properties/docker.properties', $data);
+        file_put_contents(StarterKit::VENDOR_PATH . 'phing/properties/docker.properties', $data);
         shell_exec("vendor/bin/phing -debug -f vendor/opcoding/starter-kit-tools/build.xml docker");
-        $io->write(sprintf('<info>Docker set successfully</info>'));
-        */
+    }
+
+    /**
+     * copy files from Resources/docker to project root
+     *
+     * @throws \Exception
+     */
+    private function copyFiles()
+    {
+        (new CopyFilesHelper('docker', $this->rootPathProject))->copyFiles();
     }
 }
