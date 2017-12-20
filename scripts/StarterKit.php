@@ -136,6 +136,10 @@ class StarterKit
             unset($data['scripts']['post-create-project-cmd']);
         }
 
+        if (isset($data['scripts']) && empty($data['scripts'])) {
+            unset($data['scripts']);
+        }
+
         $this->composerJson->write($data);
     }
 }
