@@ -8,11 +8,7 @@ use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Script\Event;
 use Exception;
-use FilesystemIterator;
 use Opcoding\StarterKit\Tools\Helper\QuestionsHelper;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
 
 /**
  * Class StarterKit
@@ -134,10 +130,9 @@ class StarterKit
 
         if (isset($data['scripts']['post-create-project-cmd'])) {
             unset($data['scripts']['post-create-project-cmd']);
-        }
-
-        if (empty($data['scripts'])) {
-            unset($data['scripts']);
+            if (empty($data['scripts'])) {
+                unset($data['scripts']);
+            }
         }
 
         if (isset($data['require-dev']['opcoding/starter-kit-tools'])) {
@@ -146,7 +141,6 @@ class StarterKit
                 unset($data['require-dev']);
             }
         }
-
         $this->composerJson->write($data);
     }
 }
