@@ -4,14 +4,17 @@ namespace Opcoding\StarterKit\Tools;
 
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
+use Opcoding\StarterKit\Tools\Helper\QuestionHelperAwareTrait;
 
 /**
  * Class InstallAssets
  *
  * @package Command
  */
-class ComposerScript extends AbstractQuestionScript
+class ComposerScript
 {
+
+    use QuestionHelperAwareTrait;
 
     /** @var IOInterface io */
     protected $io;

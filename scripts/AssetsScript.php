@@ -3,9 +3,12 @@ namespace Opcoding\StarterKit\Tools;
 
 use Composer\IO\IOInterface;
 use Opcoding\StarterKit\Tools\Helper\CopyFilesHelper;
+use Opcoding\StarterKit\Tools\Helper\QuestionHelperAwareTrait;
 
-class AssetsScript extends AbstractQuestionScript
+class AssetsScript
 {
+    use QuestionHelperAwareTrait;
+
     /** @var string */
     protected $rootPathProject;
 

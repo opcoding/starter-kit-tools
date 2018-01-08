@@ -1,12 +1,12 @@
 version: '2'
 services:
-    toot_api_php:
+    project_api_php:
         build: docker/images/php
         volumes:
             - ./docker/config/apache2:/etc/apache2/sites-enabled
             - ./docker/config/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
             - ./:/var/www/html
-        container_name: toot-api_php
+        container_name: project-api_php
         ports:
             - 8080:80
         networks:

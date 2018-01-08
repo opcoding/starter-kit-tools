@@ -1,22 +1,18 @@
 <?php
 
-namespace Opcoding\StarterKit\Tools;
+namespace Opcoding\StarterKit\Tools\Helper;
 
-use Opcoding\StarterKit\Tools\Helper\QuestionsHelper;
-
-abstract class AbstractQuestionScript
+/**
+ * Trait QuestionHelperAwareTrait
+ *
+ * @package Opcoding\StarterKit\Tools\Helper
+ */
+trait QuestionHelperAwareTrait
 {
-    protected $questionHelper;
-
     /**
-     * AbstractQuestionScript constructor.
-     *
-     * @param $questionHelper
+     * @var QuestionsHelper
      */
-    public function __construct($questionHelper)
-    {
-        $this->questionHelper = $questionHelper;
-    }
+    protected $questionHelper;
 
     /**
      * Get QuestionHelper
